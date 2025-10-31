@@ -16,58 +16,50 @@ class CoffeeLocalDataSourceImpl implements CoffeeLocalDataSource {
 
   /// Shared preferences instance.
   final SharedPreferences sharedPreferences;
+
   /// Image cache service instance.
   final ImageCacheService imageCacheService;
 
   static const String _favoritesKey = 'favorite_coffees';
 
   @override
-  Future<void> saveFavoriteCoffee(CoffeeModel coffee) async {
+  Future<ImageCacheResult> saveFavoriteCoffee(CoffeeModel coffee) async {
     final favorites = await getFavoriteCoffees();
-    
-    favorites..removeWhere((c) => c.id == coffee.id)
-    ..add(coffee);
-    await _saveFavorites(favorites);
-    
-    unawaited(_cacheImageInBackground(coffee));
-  }
 
-  Future<void> _cacheImageInBackground(CoffeeModel coffee) async {
-    try {
-      final cachedPath = await imageCacheService.cacheImage(coffee.imageUrl);
-      
-      if (cachedPath != null) {
-        final favorites = await getFavoriteCoffees();
-        final coffeeWithCachedPath = CoffeeModel(
-          id: coffee.id,
-          imageUrl: cachedPath,
-          isFavorite: coffee.isFavorite,
-        );
-        
-        favorites..removeWhere((c) => c.id == coffee.id)
-        ..add(coffeeWithCachedPath);
-        
-        await _saveFavorites(favorites);
-      }
-    } on Exception {
-      // Silently fail - UI already updated with URL and 
-      // cacheImage already showed error
+    // Store original URL if this is a network URL and
+    // originalUrl is not already set
+    final coffeeToSave =
+        coffee.imageUrl.startsWith('http') && coffee.originalUrl == null
+            ? coffee.copyWith(originalUrl: coffee.imageUrl)
+            : coffee;
+
+    favorites
+      ..removeWhere((c) => c.id == coffee.id)
+      ..add(coffeeToSave);
+    await _saveFavorites(favorites);
+
+    // Cache image if it's a network URL
+    if (coffeeToSave.imageUrl.startsWith('http')) {
+      return imageCacheService.cacheImage(coffeeToSave.imageUrl);
     }
+    
+    // Already a local file, return success
+    return ImageCacheResult.success(coffeeToSave.imageUrl);
   }
 
   @override
   Future<void> removeFavoriteCoffee(String coffeeId) async {
     final favorites = await getFavoriteCoffees();
-    
+
     final coffeeToRemoveIndex = favorites.indexWhere(
       (coffee) => coffee.id == coffeeId,
     );
-    
+
     if (coffeeToRemoveIndex != -1) {
       final coffeeToRemove = favorites[coffeeToRemoveIndex];
       await imageCacheService.deleteCachedImage(coffeeToRemove.imageUrl);
     }
-    
+
     favorites.removeWhere((coffee) => coffee.id == coffeeId);
     await _saveFavorites(favorites);
   }
@@ -75,20 +67,39 @@ class CoffeeLocalDataSourceImpl implements CoffeeLocalDataSource {
   @override
   Future<List<CoffeeModel>> getFavoriteCoffees() async {
     final favoritesJson = sharedPreferences.getStringList(_favoritesKey) ?? [];
-    
-    return favoritesJson
-        .map((jsonString) {
-          try {
-            final jsonData = json.decode(jsonString) as Map<String, dynamic>;
-            return CoffeeModel(
-              id: jsonData['id'] as String,
-              imageUrl: jsonData['imageUrl'] as String,
-              isFavorite: jsonData['isFavorite'] as bool? ?? true,
-            );
-          } on Exception {
-            return null;
+
+    final futures = favoritesJson.map((jsonString) async {
+      try {
+        final jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        var imageUrl = jsonData['imageUrl'] as String;
+        final originalUrl = jsonData['originalUrl'] as String?;
+
+        // Resolve cached image path at runtime (handles iOS sandbox changes)
+        if (imageUrl.startsWith('cached:')) {
+          final resolvedPath = await imageCacheService.getCachedImagePath(
+            imageUrl,
+          );
+          if (resolvedPath != null) {
+            imageUrl = resolvedPath;
+          } else if (originalUrl != null) {
+            // Cached file doesn't exist, fall back to original URL
+            imageUrl = originalUrl;
           }
-        })
+        }
+
+        return CoffeeModel(
+          id: jsonData['id'] as String,
+          imageUrl: imageUrl,
+          isFavorite: jsonData['isFavorite'] as bool? ?? true,
+          originalUrl: originalUrl,
+        );
+      } on Exception {
+        return null;
+      }
+    });
+
+    final coffees = await Future.wait(futures);
+    return coffees
         .where((coffee) => coffee != null)
         .cast<CoffeeModel>()
         .toList();
@@ -101,10 +112,9 @@ class CoffeeLocalDataSourceImpl implements CoffeeLocalDataSource {
   }
 
   Future<void> _saveFavorites(List<CoffeeModel> favorites) async {
-    final favoritesJson = favorites
-        .map((coffee) => json.encode(coffee.toJson()))
-        .toList();
-    
+    final favoritesJson =
+        favorites.map((coffee) => json.encode(coffee.toJson())).toList();
+
     await sharedPreferences.setStringList(_favoritesKey, favoritesJson);
   }
 }

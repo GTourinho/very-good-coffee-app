@@ -23,5 +23,18 @@
   
   "zoomHint": "Pellizca para hacer zoom",
   "loading": "Cargando...",
-  "failedToLoadImage": "Error al cargar la imagen"
+  "failedToLoadImage": "Error al cargar la imagen",
+  
+  "settings": "Configuración",
+  "themeSettings": "Configuración de Tema",
+  "chooseYourRoast": "Elige tu tostado de café favorito",
+  
+  "lightRoast": "Tostado Claro",
+  "lightRoastDescription": "Vibrante, fresco y cremoso",
+  
+  "mediumRoast": "Tostado Medio",
+  "mediumRoastDescription": "Equilibrado, cálido y acogedor",
+  
+  "darkRoast": "Tostado Oscuro",
+  "darkRoastDescription": "Audaz, rico y acogedor"
 }

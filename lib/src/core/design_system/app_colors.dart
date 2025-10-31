@@ -1,4 +1,5 @@
-// We can ignore this here because we don't need a 
+// coverage:ignore-file
+// We can ignore this here because we don't need a
 // comment for each individual property
 // ignore_for_file: public_member_api_docs
 
@@ -53,8 +54,53 @@ class AppColors {
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
 
-  // Coffee-specific Colors
-  static const Color coffeeLight = Color(0xFFA67C52);
+  // Coffee Roast-specific Colors
+  // Light Roast Theme Colors (Brightest)
+  static const Color lightRoastPrimary = Color(
+    0xFFC4956C,
+  ); // Light coffee brown
+  static const Color lightRoastBackground = Color(
+    0xFFFFFBF5,
+  ); // Lightest cream
+  static const Color lightRoastSurface = Color(
+    0xFFFFF5E6,
+  ); // Very light tan
+  static const Color lightRoastAccent = Color(
+    0xFFE5C9A0,
+  ); // Light caramel
+
+  // Medium Roast Theme Colors (Balanced)
+  static const Color mediumRoastPrimary = Color(
+    0xFF9B7653,
+  ); // Medium coffee brown
+  static const Color mediumRoastBackground = Color(
+    0xFFF5EFE7,
+  ); // Warm cream
+  static const Color mediumRoastSurface = Color(
+    0xFFEFE3D0,
+  ); // Medium tan
+  static const Color mediumRoastAccent = Color(
+    0xFFD4B896,
+  ); // Caramel
+
+  // Dark Roast Theme Colors (Darkest - with better contrast)
+  static const Color darkRoastPrimary = Color(
+    0xFFB8956F,
+  ); // Lighter coffee for contrast
+  static const Color darkRoastBackground = Color(
+    0xFF1C1410,
+  ); // Very dark brown
+  static const Color darkRoastSurface = Color(
+    0xFF2D2318,
+  ); // Dark surface
+  static const Color darkRoastAccent = Color(
+    0xFFC4A076,
+  ); // Light accent for contrast
+
+  // Legacy coffee colors (kept for compatibility)
+  static const Color coffeeLight = Color(
+    0xFFA67C52,
+  );
   static const Color coffeeMedium = Color(0xFF6F4E37);
   static const Color coffeeDark = Color(0xFF3E2723);
   static const Color cream = Color(0xFFF5DEB3);

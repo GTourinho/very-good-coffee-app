@@ -1,3 +1,4 @@
+import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 
 /// {@template coffee_repository}
@@ -18,7 +19,8 @@ abstract class CoffeeRepository {
   /// Saves a coffee image as favorite.
   /// 
   /// Takes a [coffee] entity to save.
-  Future<void> saveFavoriteCoffee(Coffee coffee);
+  /// Returns [ImageCacheResult] indicating caching success or failure.
+  Future<ImageCacheResult> saveFavoriteCoffee(Coffee coffee);
 
   /// Removes a coffee image from favorites.
   /// 

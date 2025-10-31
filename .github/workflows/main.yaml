@@ -21,6 +21,13 @@ jobs:
     with:
       flutter_channel: stable
 
+  test:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
+    with:
+      flutter_channel: stable
+      coverage_comment: true
+      jobs: '{"test": "very_good test --coverage --min-coverage 83"}'
+
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
     with:

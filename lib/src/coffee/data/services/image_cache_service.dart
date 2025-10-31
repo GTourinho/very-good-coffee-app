@@ -1,191 +1,68 @@
-// We can ignore this rule because we are using async io
-// outside of the UI
-// ignore_for_file: avoid_slow_async_io
+/// Result of image cache operation
+class ImageCacheResult {
+  /// Creates an image cache result.
+  const ImageCacheResult({
+    this.success = false,
+    this.filePath,
+    this.errorType,
+    this.errorMessage,
+  });
 
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:coffee_app/src/core/services/user_feedback_service.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
-
-
-/// Service for caching images with user feedback.
-class ImageCacheService {
-  /// Creates an image cache service.
-  ImageCacheService({Future<Directory> Function()? getDirectory})
-      : _getDirectory = getDirectory;
-
-  final Future<Directory> Function()? _getDirectory;
-
-  static const int _maxImageWidth = 800;
-  static const int _maxImageHeight = 800;
-  static const int _jpegQuality = 85;
-
-  Future<Directory> get _directory async {
-    final getDir = _getDirectory;
-    if (getDir != null) {
-      return getDir();
-    }
-    return getApplicationDocumentsDirectory();
-  }
-
-  /// Caches an image from URL with user feedback.
-  /// If context is null, caches silently without showing feedback.
-  Future<String?> cacheImage(
-    String imageUrl, {
-    BuildContext? context,
-  }) async {
-    try {
-      // Check if it's already a cached file path
-      if (imageUrl.startsWith('/')) {
-        return imageUrl; // Already cached, return the path
-      }
-
-      final response = await http.get(Uri.parse(imageUrl));
-
-      if (response.statusCode != 200) {
-        if (context != null && context.mounted) {
-          UserFeedbackService.showSnackBar(
-            context,
-            'Failed to download image. Please try again.',
-            type: FeedbackType.error,
-          );
-        }
-        return null;
-      }
-
-      final bytes = response.bodyBytes;
-      final compressedBytes = await _compressImage(bytes);
-      
-      final directory = await _directory;
-      final fileName = imageUrl.split('/').last;
-      final file = File('${directory.path}/coffee_images/$fileName');
-
-      await file.parent.create(recursive: true);
-      await file.writeAsBytes(compressedBytes);
-      
-      return file.path;
-    } on SocketException {
-      if (context != null && context.mounted) {
-        UserFeedbackService.showSnackBar(
-          context,
-          'Network error. Please check your connection.',
-          type: FeedbackType.error,
-        );
-      }
-      return null;
-    } on HttpException {
-      if (context != null && context.mounted) {
-        UserFeedbackService.showSnackBar(
-          context,
-          'Server error. Please try again later.',
-          type: FeedbackType.error,
-        );
-      }
-      return null;
-    } on Exception {
-      if (context != null && context.mounted) {
-        UserFeedbackService.showSnackBar(
-          context,
-          'An unexpected error occurred.',
-          type: FeedbackType.error,
-        );
-      }
-      return null;
-    }
-  }
-
-  /// Compresses image bytes.
-  Future<Uint8List> _compressImage(Uint8List bytes) async {
-    try {
-      final originalImage = img.decodeImage(bytes);
-      if (originalImage == null) {
-        // Can't decode, return original bytes
-        return bytes;
-      }
-
-      // Only resize if image is larger than max dimensions
-      if (originalImage.width <= _maxImageWidth &&
-          originalImage.height <= _maxImageHeight) {
-        // Image is already small enough, just compress
-        final compressedBytes = img.encodeJpg(
-          originalImage,
-          quality: _jpegQuality,
-        );
-        return compressedBytes;
-      }
-
-      final resizedImage = img.copyResize(
-        originalImage,
-        width: originalImage.width > _maxImageWidth ? _maxImageWidth : null,
-        height: originalImage.height > _maxImageHeight ? _maxImageHeight : null,
-        interpolation: img.Interpolation.average,
+  /// Creates a successful result.
+  factory ImageCacheResult.success(String filePath) => ImageCacheResult(
+        success: true,
+        filePath: filePath,
       );
 
-      final compressedBytes = img.encodeJpg(
-        resizedImage,
-        quality: _jpegQuality,
+  /// Creates an error result.
+  factory ImageCacheResult.error(
+    ImageCacheErrorType errorType,
+    String errorMessage,
+  ) =>
+      ImageCacheResult(
+        errorType: errorType,
+        errorMessage: errorMessage,
       );
 
-      return compressedBytes;
-    } on Exception {
-      // If compression fails, return original bytes
-      return bytes;
-    }
-  }
+  /// Whether the operation was successful.
+  final bool success;
 
-  /// Clears all cached images with user feedback.
-  /// If context is null, clears silently without showing feedback.
-  Future<void> clearCache({BuildContext? context}) async {
-    try {
-      final directory = await _directory;
-      final cacheDir = Directory('${directory.path}/coffee_images');
+  /// The cached file path if successful.
+  final String? filePath;
 
-      if (await cacheDir.exists()) {
-        await cacheDir.delete(recursive: true);
-      }
-    } on FileSystemException {
-      if (context != null && context.mounted) {
-        UserFeedbackService.showSnackBar(
-          context,
-          'Failed to clear cache. Please try again.',
-          type: FeedbackType.error,
-        );
-      }
-    } on Exception {
-      if (context != null && context.mounted) {
-        UserFeedbackService.showSnackBar(
-          context,
-          'An unexpected error occurred.',
-          type: FeedbackType.error,
-        );
-      }
-    }
-  }
+  /// The type of error if failed.
+  final ImageCacheErrorType? errorType;
 
-  /// Gets cached image path.
-  Future<String?> getCachedImagePath(String imageUrl) async {
-    final directory = await _directory;
-    final fileName = imageUrl.split('/').last;
-    final file = File('${directory.path}/coffee_images/$fileName');
+  /// The error message if failed.
+  final String? errorMessage;
+}
 
-    if (await file.exists()) {
-      return file.path;
-    }
-    return null;
-  }
+/// Types of errors that can occur during image caching
+enum ImageCacheErrorType {
+  /// Network connectivity issue
+  network,
+
+  /// HTTP request failed (non-200 status)
+  http,
+
+  /// Server returned an error
+  server,
+
+  /// File system operation failed
+  filesystem,
+
+  /// Unknown error occurred
+  unknown,
+}
+
+/// Abstract interface for image cache service
+abstract class ImageCacheService {
+  /// Caches an image from URL.
+  Future<ImageCacheResult> cacheImage(String imageUrl);
 
   /// Deletes a cached image.
-  Future<void> deleteCachedImage(String imageUrl) async {
-    final directory = await _directory;
-    final fileName = imageUrl.split('/').last;
-    final file = File('${directory.path}/coffee_images/$fileName');
+  Future<void> deleteCachedImage(String imageUrl);
 
-    if (await file.exists()) {
-      await file.delete(recursive: true);
-    }
-  }
+  /// Gets the full file path for a cached image identifier.
+  Future<String?> getCachedImagePath(String imageIdentifier);
 }

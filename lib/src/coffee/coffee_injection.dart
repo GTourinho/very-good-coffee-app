@@ -4,6 +4,7 @@ import 'package:coffee_app/src/coffee/data/datasources/coffee_remote_datasource.
 import 'package:coffee_app/src/coffee/data/datasources/coffee_remote_datasource_impl.dart';
 import 'package:coffee_app/src/coffee/data/repositories/coffee_repository_impl.dart';
 import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
+import 'package:coffee_app/src/coffee/data/services/image_cache_service_impl.dart';
 import 'package:coffee_app/src/coffee/domain/repositories/coffee_repository.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_favorite_coffees.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_random_coffee.dart';
@@ -25,7 +26,9 @@ class CoffeeInjection {
     ..registerLazySingleton(http.Client.new)
 
     // Services
-    ..registerLazySingleton(ImageCacheService.new)
+    ..registerLazySingleton<ImageCacheService>(
+      ImageCacheServiceImpl.new,
+    )
 
     // Data sources
     ..registerLazySingleton<CoffeeRemoteDataSource>(

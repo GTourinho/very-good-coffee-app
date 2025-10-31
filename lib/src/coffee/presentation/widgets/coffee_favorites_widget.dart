@@ -184,6 +184,9 @@ class _CoffeeImage extends StatelessWidget {
         height: 200,
         width: double.infinity,
         fit: BoxFit.cover,
+        // Optimize memory - decode at thumbnail size
+        cacheWidth: 400,
+        cacheHeight: 300,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(

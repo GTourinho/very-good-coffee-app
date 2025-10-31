@@ -5,9 +5,9 @@ import 'package:coffee_app/src/coffee/domain/usecases/toggle_favorite_coffee.dar
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/presentation/pages/coffee_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetRandomCoffee extends Mock implements GetRandomCoffee {}
@@ -22,10 +22,22 @@ void main() {
     late MockGetFavoriteCoffees mockGetFavoriteCoffees;
     late MockToggleFavoriteCoffee mockToggleFavoriteCoffee;
 
-    setUp(() {
+    setUp(() async {
+      await GetIt.instance.reset();
       mockGetRandomCoffee = MockGetRandomCoffee();
       mockGetFavoriteCoffees = MockGetFavoriteCoffees();
       mockToggleFavoriteCoffee = MockToggleFavoriteCoffee();
+      
+      // Register CoffeeBloc in GetIt for the pages to use
+      GetIt.instance.registerFactory<CoffeeBloc>(() => CoffeeBloc(
+        getRandomCoffee: mockGetRandomCoffee,
+        getFavoriteCoffees: mockGetFavoriteCoffees,
+        toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+      ),);
+    });
+
+    tearDown(() async {
+      await GetIt.instance.reset();
     });
 
     testWidgets('renders CoffeePage', (tester) async {
@@ -35,28 +47,15 @@ void main() {
       when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
+        const MaterialApp(
+          localizationsDelegates: [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider(
-            create: (_) => CoffeeBloc(
-              getRandomCoffee: mockGetRandomCoffee,
-              getFavoriteCoffees: mockGetFavoriteCoffees,
-              toggleFavoriteCoffee: mockToggleFavoriteCoffee,
-            ),
-            child: Builder(
-              builder: (context) {
-                return CoffeePage(
-                  coffeeBloc: context.read<CoffeeBloc>(),
-                );
-              },
-            ),
-          ),
+          home: CoffeePage(),
         ),
       );
       expect(find.byType(CoffeePage), findsOneWidget);

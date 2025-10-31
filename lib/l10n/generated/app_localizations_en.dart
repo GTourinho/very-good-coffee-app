@@ -63,4 +63,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToLoadImage => 'Failed to load image';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get themeSettings => 'Theme Settings';
+
+  @override
+  String get chooseYourRoast => 'Choose your favorite coffee roast';
+
+  @override
+  String get lightRoast => 'Light Roast';
+
+  @override
+  String get lightRoastDescription => 'Bright, fresh, and creamy vibe';
+
+  @override
+  String get mediumRoast => 'Medium Roast';
+
+  @override
+  String get mediumRoastDescription => 'Balanced, warm, and inviting';
+
+  @override
+  String get darkRoast => 'Dark Roast';
+
+  @override
+  String get darkRoastDescription => 'Bold, rich, and cozy feel';
 }

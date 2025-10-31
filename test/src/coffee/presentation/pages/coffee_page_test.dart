@@ -10,6 +10,7 @@ import 'package:coffee_app/src/coffee/presentation/widgets/coffee_image_widget.d
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockCoffeeBloc extends MockBloc<CoffeeEvent, CoffeeState>
@@ -18,20 +19,26 @@ class MockCoffeeBloc extends MockBloc<CoffeeEvent, CoffeeState>
 void main() {
   late MockCoffeeBloc mockCoffeeBloc;
 
-  setUp(() {
+  setUp(() async {
+    await GetIt.instance.reset();
     mockCoffeeBloc = MockCoffeeBloc();
+    GetIt.instance.registerFactory<CoffeeBloc>(() => mockCoffeeBloc);
+  });
+
+  tearDown(() async {
+    await GetIt.instance.reset();
   });
 
   Widget createWidgetUnderTest() {
-    return MaterialApp(
-      localizationsDelegates: const [
+    return const MaterialApp(
+      localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      home: CoffeePage(coffeeBloc: mockCoffeeBloc),
+      home: CoffeePage(),
     );
   }
 
@@ -154,6 +161,101 @@ void main() {
       await tester.pump();
 
       expect(find.text(errorMessage), findsOneWidget);
+    });
+
+    testWidgets('dispatches CoffeeRequested when get coffee button is tapped',
+        (tester) async {
+      when(() => mockCoffeeBloc.state).thenReturn(const CoffeeInitial());
+      when(() => mockCoffeeBloc.stream).thenAnswer(
+        (_) => const Stream<CoffeeState>.empty(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.tap(find.text('Get Your First Coffee'));
+      verify(() => mockCoffeeBloc.add(const CoffeeRequested())).called(1);
+    });
+
+    testWidgets(
+      'dispatches CoffeeRequested when retry button is tapped in error state',
+      (tester) async {
+      const errorMessage = 'Test error';
+      when(() => mockCoffeeBloc.state).thenReturn(
+        const CoffeeLoadFailure(errorMessage),
+      );
+      when(() => mockCoffeeBloc.stream).thenAnswer(
+        (_) => const Stream<CoffeeState>.empty(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.tap(find.text('Try Again'));
+      verify(() => mockCoffeeBloc.add(const CoffeeRequested())).called(1);
+    });
+
+    testWidgets(
+      'dispatches CoffeeRequested when button is tapped in empty success state',
+      (tester) async {
+      when(() => mockCoffeeBloc.state).thenReturn(
+        const CoffeeLoadSuccess(),
+      );
+      when(() => mockCoffeeBloc.stream).thenAnswer(
+        (_) => const Stream<CoffeeState>.empty(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.tap(find.text('Get Your First Coffee'));
+      verify(() => mockCoffeeBloc.add(const CoffeeRequested())).called(1);
+    });
+
+    testWidgets(
+      'shows previous state content when CoffeeActionError is emitted',
+      (tester) async {
+      const testCoffee = Coffee(
+        id: 'test-id',
+        imageUrl: 'https://example.com/coffee.jpg',
+      );
+      const previousState = CoffeeLoadSuccess(currentCoffee: testCoffee);
+
+      when(() => mockCoffeeBloc.state).thenReturn(
+        const CoffeeActionError(
+          error: 'Action error',
+          previousState: previousState,
+        ),
+      );
+      when(() => mockCoffeeBloc.stream).thenAnswer(
+        (_) => const Stream<CoffeeState>.empty(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Should show the coffee image widget from previous state
+      expect(find.byType(CoffeeImageWidget<CoffeeModel>), findsOneWidget);
+    });
+
+    testWidgets(
+      'dispatches CoffeeRequested when refresh is tapped on coffee image',
+      (tester) async {
+      const testCoffee = Coffee(
+        id: 'test-id',
+        imageUrl: 'https://example.com/coffee.jpg',
+      );
+
+      when(() => mockCoffeeBloc.state).thenReturn(
+        const CoffeeLoadSuccess(currentCoffee: testCoffee),
+      );
+      when(() => mockCoffeeBloc.stream).thenAnswer(
+        (_) => const Stream<CoffeeState>.empty(),
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Find and tap the "New Coffee" refresh button
+      await tester.tap(find.text('New Coffee'));
+      
+      // Verify CoffeeRequested event was dispatched
+      verify(() => mockCoffeeBloc.add(const CoffeeRequested())).called(1);
     });
   });
 }
