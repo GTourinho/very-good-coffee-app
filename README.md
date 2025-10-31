@@ -39,10 +39,9 @@ A beautiful Flutter app that lets you discover and favorite coffee images from a
 ![Coverage Report](docs/coverage_report.png)
 
 This project maintains **100% code coverage** across all source files:
-- ✅ **236 tests** covering all business logic
-- ✅ **719/719 lines** covered with zero exclusions
+- ✅ **249 tests** covering all business logic
+- ✅ **761/761 lines** covered with zero exclusions
 - ✅ All layers tested: Data, Domain, Business Logic, and Presentation
-- ✅ No ignored lines or shortcuts - genuine 100% coverage
 
 ---
 

@@ -64,13 +64,13 @@ class CoffeeLoadSuccess extends CoffeeState {
 /// {@endtemplate}
 class CoffeeLoadFailure extends CoffeeState {
   /// {@macro coffee_load_failure}
-  const CoffeeLoadFailure(this.error);
+  const CoffeeLoadFailure(this.errorKey);
 
-  /// The error message describing the failure.
-  final String error;
+  /// The localization key for the error message.
+  final String errorKey;
 
   @override
-  List<Object?> get props => [error];
+  List<Object?> get props => [errorKey];
 }
 
 /// {@template coffee_action_error}
@@ -80,16 +80,16 @@ class CoffeeLoadFailure extends CoffeeState {
 class CoffeeActionError extends CoffeeState {
   /// {@macro coffee_action_error}
   const CoffeeActionError({
-    required this.error,
+    required this.errorKey,
     required this.previousState,
   });
 
-  /// The error message describing the failure.
-  final String error;
+  /// The localization key for the error message.
+  final String errorKey;
   
   /// The previous success state to restore.
   final CoffeeLoadSuccess previousState;
 
   @override
-  List<Object?> get props => [error, previousState];
+  List<Object?> get props => [errorKey, previousState];
 }

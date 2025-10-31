@@ -5,6 +5,7 @@ import 'package:coffee_app/src/coffee/domain/usecases/get_favorite_coffees.dart'
 import 'package:coffee_app/src/coffee/domain/usecases/get_random_coffee.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/toggle_favorite_coffee.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -92,7 +93,7 @@ void main() {
       expect: () => [
         const CoffeeLoadInProgress(),
         const CoffeeLoadFailure(
-          'Oops! Could not load a coffee image. Please try again.',
+          CoffeeErrorKeys.loadCoffee,
         ),
       ],
       verify: (_) {
@@ -257,9 +258,9 @@ void main() {
         ),
         // Error state for snackbar
         isA<CoffeeActionError>().having(
-          (e) => e.error,
+          (e) => e.errorKey,
           'error',
-          'Failed to toggle favorite. Please try again.',
+          'couldNotUpdateFavorites',
         ),
       ],
     );
@@ -327,9 +328,9 @@ void main() {
         ),
         // Error state for snackbar
         isA<CoffeeActionError>().having(
-          (e) => e.error,
+          (e) => e.errorKey,
           'error',
-          'Failed to toggle favorite. Please try again.',
+          'couldNotUpdateFavorites',
         ),
       ],
     );
@@ -350,7 +351,7 @@ void main() {
       act: (bloc) => bloc.add(const CoffeeFavoritesRequested()),
       expect: () => [
         const CoffeeLoadFailure(
-          'Oops! Could not load your favorite coffees. Please try again.',
+          CoffeeErrorKeys.loadFavorites,
         ),
       ],
     );
@@ -407,9 +408,9 @@ void main() {
         ),
         // Error state for snackbar
         isA<CoffeeActionError>().having(
-          (e) => e.error,
+          (e) => e.errorKey,
           'error',
-          'Failed to toggle favorite. Please try again.',
+          'couldNotUpdateFavorites',
         ),
       ],
     );
@@ -476,9 +477,9 @@ void main() {
         ),
         // Error state for snackbar
         isA<CoffeeActionError>().having(
-          (e) => e.error,
+          (e) => e.errorKey,
           'error',
-          'Failed to toggle favorite. Please try again.',
+          'couldNotUpdateFavorites',
         ),
       ],
     );
@@ -535,9 +536,9 @@ void main() {
         ),
         // Error state for snackbar
         isA<CoffeeActionError>().having(
-          (e) => e.error,
+          (e) => e.errorKey,
           'error',
-          'Failed to toggle favorite. Please try again.',
+          'couldNotUpdateFavorites',
         ),
       ],
     );
@@ -557,7 +558,7 @@ void main() {
       act: (bloc) => bloc.add(const CoffeeFavoritesRequested()),
       expect: () => [
         const CoffeeLoadFailure(
-          'Oops! Could not load your favorite coffees. Please try again.',
+          CoffeeErrorKeys.loadFavorites,
         ),
       ],
     );
@@ -742,7 +743,7 @@ void main() {
             ),
             ImageCacheResult.error(
               ImageCacheErrorType.network,
-              'Network error occurred',
+              'couldNotUpdateFavorites',
             ),
           ),
         );
@@ -794,9 +795,9 @@ void main() {
         // Error state for snackbar with cache error message
         isA<CoffeeActionError>()
             .having(
-              (e) => e.error,
+              (e) => e.errorKey,
               'error',
-              'Network error occurred',
+              'couldNotUpdateFavorites',
             )
             .having(
               (e) => e.previousState,

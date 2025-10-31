@@ -3,6 +3,7 @@ import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_favorite_coffees.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_random_coffee.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/toggle_favorite_coffee.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
 
@@ -47,9 +48,7 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
       );
     } on Exception {
       emit(
-        const CoffeeLoadFailure(
-          'Oops! Could not load a coffee image. Please try again.',
-        ),
+        const CoffeeLoadFailure(CoffeeErrorKeys.loadCoffee),
       );
     }
   }
@@ -76,9 +75,7 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
       }
     } on Exception {
       emit(
-        const CoffeeLoadFailure(
-          'Oops! Could not load your favorite coffees. Please try again.',
-        ),
+        const CoffeeLoadFailure(CoffeeErrorKeys.loadFavorites),
       );
     }
   }
@@ -132,7 +129,7 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
           emit(previousState);
           emit(
             CoffeeActionError(
-              error: cacheResult.errorMessage!,
+              errorKey: CoffeeErrorKeys.updateFavorites,
               previousState: previousState,
             ),
           );
@@ -163,7 +160,7 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
         emit(previousState);
         emit(
           CoffeeActionError(
-            error: 'Failed to toggle favorite. Please try again.',
+            errorKey: CoffeeErrorKeys.updateFavorites,
             previousState: previousState,
           ),
         );

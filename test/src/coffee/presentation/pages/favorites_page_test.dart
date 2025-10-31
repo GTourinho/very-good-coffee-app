@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:coffee_app/l10n/generated/app_localizations.dart';
 import 'package:coffee_app/src/coffee/data/models/coffee_model.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
 import 'package:coffee_app/src/coffee/presentation/pages/favorites_page.dart';
@@ -41,7 +42,6 @@ void main() {
   }
 
   group('FavoritesPage', () {
-
     testWidgets('displays cached image when available', (tester) async {
       const coffee = CoffeeModel(
         id: 'test_id',
@@ -77,9 +77,10 @@ void main() {
     });
 
     testWidgets('shows error state when CoffeeLoadFailure', (tester) async {
-      const errorMessage = 'Failed to load favorites';
+      const errorMessage =
+          'Could not load your favorite coffees. Please try again.';
       when(() => mockCoffeeBloc.state).thenReturn(
-        const CoffeeLoadFailure(errorMessage),
+        const CoffeeLoadFailure(CoffeeErrorKeys.loadFavorites),
       );
       when(() => mockCoffeeBloc.stream).thenAnswer(
         (_) => const Stream<CoffeeState>.empty(),
@@ -92,26 +93,30 @@ void main() {
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
-    testWidgets('shows loading indicator when not in success or failure state',
-        (tester) async {
-      when(() => mockCoffeeBloc.state).thenReturn(const CoffeeInitial());
-      when(() => mockCoffeeBloc.stream).thenAnswer(
-        (_) => const Stream<CoffeeState>.empty(),
-      );
+    testWidgets(
+      'shows loading indicator when not in success or failure state',
+      (tester) async {
+        when(() => mockCoffeeBloc.state).thenReturn(const CoffeeInitial());
+        when(() => mockCoffeeBloc.stream).thenAnswer(
+          (_) => const Stream<CoffeeState>.empty(),
+        );
 
-      await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      },
+    );
 
-    testWidgets('shows snackbar when CoffeeLoadFailure is emitted',
-        (tester) async {
-      const errorMessage = 'Test error';
+    testWidgets('shows snackbar when CoffeeLoadFailure is emitted', (
+      tester,
+    ) async {
+      const errorMessage =
+          'Could not load your favorite coffees. Please try again.';
       when(() => mockCoffeeBloc.state).thenReturn(const CoffeeLoadSuccess());
       whenListen(
         mockCoffeeBloc,
         Stream.fromIterable([
-          const CoffeeLoadFailure(errorMessage),
+          const CoffeeLoadFailure(CoffeeErrorKeys.loadFavorites),
         ]),
       );
 
@@ -121,9 +126,11 @@ void main() {
       expect(find.text(errorMessage), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('shows snackbar when CoffeeActionError is emitted',
-        (tester) async {
-      const errorMessage = 'Action error';
+    testWidgets('shows snackbar when CoffeeActionError is emitted', (
+      tester,
+    ) async {
+      const errorMessage =
+          'Oops! Could not update your favorites. Please try again';
       const previousState = CoffeeLoadSuccess(
         currentCoffee: CoffeeModel(
           id: 'test',
@@ -136,7 +143,7 @@ void main() {
         mockCoffeeBloc,
         Stream.fromIterable([
           const CoffeeActionError(
-            error: errorMessage,
+            errorKey: CoffeeErrorKeys.updateFavorites,
             previousState: previousState,
           ),
         ]),
@@ -148,8 +155,7 @@ void main() {
       expect(find.text(errorMessage), findsOneWidget);
     });
 
-    testWidgets('dispatches CoffeeFavoritesRequested on load',
-        (tester) async {
+    testWidgets('dispatches CoffeeFavoritesRequested on load', (tester) async {
       when(() => mockCoffeeBloc.state).thenReturn(const CoffeeLoadSuccess());
       when(() => mockCoffeeBloc.stream).thenAnswer(
         (_) => const Stream<CoffeeState>.empty(),
@@ -157,35 +163,40 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      verify(() => mockCoffeeBloc.add(const CoffeeFavoritesRequested()))
-          .called(1);
+      verify(
+        () => mockCoffeeBloc.add(const CoffeeFavoritesRequested()),
+      ).called(1);
     });
 
-    testWidgets('dispatches CoffeeFavoriteToggled when delete button is tapped',
-        (tester) async {
-      const coffee = CoffeeModel(
-        id: 'test_id',
-        imageUrl: 'https://example.com/test.jpg',
-        isFavorite: true,
-      );
+    testWidgets(
+      'dispatches CoffeeFavoriteToggled when delete button is tapped',
+      (tester) async {
+        const coffee = CoffeeModel(
+          id: 'test_id',
+          imageUrl: 'https://example.com/test.jpg',
+          isFavorite: true,
+        );
 
-      when(() => mockCoffeeBloc.state).thenReturn(
-        const CoffeeLoadSuccess(favoriteCoffees: [coffee]),
-      );
-      when(() => mockCoffeeBloc.stream).thenAnswer(
-        (_) => const Stream<CoffeeState>.empty(),
-      );
+        when(() => mockCoffeeBloc.state).thenReturn(
+          const CoffeeLoadSuccess(favoriteCoffees: [coffee]),
+        );
+        when(() => mockCoffeeBloc.stream).thenAnswer(
+          (_) => const Stream<CoffeeState>.empty(),
+        );
 
-      await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpWidget(createWidgetUnderTest());
 
-      // Find and tap the delete button
-      await tester.tap(find.byIcon(Icons.delete_outline));
-      verify(() => mockCoffeeBloc.add(const CoffeeFavoriteToggled(coffee)))
-          .called(1);
-    });
+        // Find and tap the delete button
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        verify(
+          () => mockCoffeeBloc.add(const CoffeeFavoriteToggled(coffee)),
+        ).called(1);
+      },
+    );
 
-    testWidgets('shows file-based image when imageUrl is file path',
-        (tester) async {
+    testWidgets('shows file-based image when imageUrl is file path', (
+      tester,
+    ) async {
       const coffee = CoffeeModel(
         id: 'test_id',
         imageUrl: '/path/to/local/image.jpg',
@@ -223,8 +234,7 @@ void main() {
       expect(find.byType(Image), findsOneWidget);
     });
 
-    testWidgets('shows error UI when file image fails to load',
-        (tester) async {
+    testWidgets('shows error UI when file image fails to load', (tester) async {
       const coffee = CoffeeModel(
         id: 'test_id',
         imageUrl: '/nonexistent/invalid/path/image.jpg',

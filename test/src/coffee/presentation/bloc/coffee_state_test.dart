@@ -1,4 +1,5 @@
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -40,7 +41,13 @@ void main() {
           currentCoffee: coffee,
           favoriteCoffees: [coffee],
         );
-        expect(state.props, containsAll([coffee, [coffee]]));
+        expect(
+          state.props,
+          containsAll([
+            coffee,
+            [coffee],
+          ]),
+        );
       });
 
       test('copyWith creates new state with updated values', () {
@@ -105,14 +112,14 @@ void main() {
 
     group('CoffeeLoadFailure', () {
       test('props contains error', () {
-        const state = CoffeeLoadFailure('Test error');
-        expect(state.props, contains('Test error'));
+        const state = CoffeeLoadFailure(CoffeeErrorKeys.loadCoffee);
+        expect(state.props, contains(CoffeeErrorKeys.loadCoffee));
       });
 
       test('equality works correctly', () {
-        const state1 = CoffeeLoadFailure('Error');
-        const state2 = CoffeeLoadFailure('Error');
-        const state3 = CoffeeLoadFailure('Different error');
+        const state1 = CoffeeLoadFailure(CoffeeErrorKeys.loadCoffee);
+        const state2 = CoffeeLoadFailure(CoffeeErrorKeys.loadCoffee);
+        const state3 = CoffeeLoadFailure(CoffeeErrorKeys.loadFavorites);
 
         expect(state1, equals(state2));
         expect(state1, isNot(equals(state3)));
@@ -127,10 +134,13 @@ void main() {
         );
         const previousState = CoffeeLoadSuccess(currentCoffee: coffee);
         const state = CoffeeActionError(
-          error: 'Action error',
+          errorKey: CoffeeErrorKeys.updateFavorites,
           previousState: previousState,
         );
-        expect(state.props, containsAll(['Action error', previousState]));
+        expect(
+          state.props,
+          containsAll([CoffeeErrorKeys.updateFavorites, previousState]),
+        );
       });
 
       test('equality works correctly', () {
@@ -142,15 +152,15 @@ void main() {
         const previousState2 = CoffeeLoadSuccess(currentCoffee: coffee);
 
         const state1 = CoffeeActionError(
-          error: 'Error',
+          errorKey: CoffeeErrorKeys.updateFavorites,
           previousState: previousState1,
         );
         const state2 = CoffeeActionError(
-          error: 'Error',
+          errorKey: CoffeeErrorKeys.updateFavorites,
           previousState: previousState2,
         );
         const state3 = CoffeeActionError(
-          error: 'Different error',
+          errorKey: 'differentError',
           previousState: previousState1,
         );
 

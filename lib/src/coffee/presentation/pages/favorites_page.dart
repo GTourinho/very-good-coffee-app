@@ -6,6 +6,7 @@ import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state_extensions.dart';
 import 'package:coffee_app/src/coffee/presentation/widgets/main_navigation.dart';
 import 'package:coffee_app/src/core/design_system/app_colors.dart';
 import 'package:coffee_app/src/core/design_system/app_spacing.dart';
@@ -47,13 +48,13 @@ class _FavoritesPageContent extends StatelessWidget {
           if (state is CoffeeLoadFailure) {
             UserFeedbackService.showSnackBar(
               context,
-              state.error,
+              state.getLocalizedMessage(context),
               type: FeedbackType.error,
             );
           } else if (state is CoffeeActionError) {
             UserFeedbackService.showSnackBar(
               context,
-              state.error,
+              state.getLocalizedMessage(context),
               type: FeedbackType.error,
             );
           }
@@ -123,7 +124,7 @@ class _FavoritesPageContent extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      state.error,
+                      state.getLocalizedMessage(context),
                       style: AppTextStyles.bodyText,
                       textAlign: TextAlign.center,
                     ),

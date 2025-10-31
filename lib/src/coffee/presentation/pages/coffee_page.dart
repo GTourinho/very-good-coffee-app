@@ -1,8 +1,10 @@
 import 'package:coffee_app/l10n/generated/app_localizations.dart';
+import 'package:coffee_app/l10n/l10n.dart';
 import 'package:coffee_app/src/coffee/data/models/coffee_model.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state_extensions.dart';
 import 'package:coffee_app/src/coffee/presentation/widgets/coffee_image_widget.dart';
 import 'package:coffee_app/src/coffee/presentation/widgets/main_navigation.dart';
 import 'package:coffee_app/src/core/design_system/app_colors.dart';
@@ -60,13 +62,13 @@ class _CoffeePageContentState extends State<_CoffeePageContent> {
           if (state is CoffeeLoadFailure) {
             UserFeedbackService.showSnackBar(
               context,
-              state.error,
+              state.getLocalizedMessage(context),
               type: FeedbackType.error,
             );
           } else if (state is CoffeeActionError) {
             UserFeedbackService.showSnackBar(
               context,
-              state.error,
+              state.getLocalizedMessage(context),
               type: FeedbackType.error,
             );
           }
@@ -123,7 +125,7 @@ class _CoffeePageContentState extends State<_CoffeePageContent> {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        state.error,
+                        state.getLocalizedMessage(context),
                         style: AppTextStyles.bodyText,
                         textAlign: TextAlign.center,
                       ),

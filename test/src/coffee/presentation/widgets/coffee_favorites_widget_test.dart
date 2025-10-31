@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
+import 'package:coffee_app/src/coffee/presentation/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
 import 'package:coffee_app/src/coffee/presentation/widgets/coffee_favorites_widget.dart';
@@ -50,9 +51,8 @@ void main() {
     });
 
     testWidgets('shows error state when load fails', (tester) async {
-      const errorMessage = 'Failed to load';
       when(() => mockCoffeeBloc.state).thenReturn(
-        const CoffeeLoadFailure(errorMessage),
+        const CoffeeLoadFailure(CoffeeErrorKeys.loadFavorites),
       );
       when(() => mockCoffeeBloc.stream).thenAnswer(
         (_) => const Stream<CoffeeState>.empty(),
