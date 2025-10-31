@@ -1,0 +1,5 @@
+# Test configuration
+tags:
+  # Integration tests that require platform plugins
+  integration:
+    description: Integration tests requiring platform plugins like path_provider

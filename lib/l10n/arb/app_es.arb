@@ -1,0 +1,27 @@
+{
+  "@@locale": "es",
+  "appTitle": "Muy Buena App de Café",
+  
+  "favorites": "Favoritos",
+  "home": "Inicio",
+  
+  "favoriteCoffees": "Cafés Favoritos",
+  
+  "getYourFirstCoffee": "Obtén tu Primer Café",
+  "newCoffee": "Nuevo Café",
+  "tryAgain": "Intentar de Nuevo",
+  
+  "noFavoriteCoffees": "No hay cafés favoritos aún",
+  "noFavoriteCoffeesDescription": "Toca el ícono del corazón en cualquier café para agregarlo a favoritos",
+  
+  "oopsSomethingWentWrong": "¡Ups! Algo salió mal",
+  "couldNotLoadCoffees": "No se pudieron cargar tus cafés favoritos. Por favor intenta de nuevo.",
+  "couldNotLoadCoffee": "No se pudo cargar el café. Por favor intenta de nuevo.",
+  "couldNotUpdateFavorites": "¡Ups! No se pudieron actualizar tus favoritos. Por favor intenta de nuevo",
+  
+  "coffee": "Café #{id}",
+  
+  "zoomHint": "Pellizca para hacer zoom",
+  "loading": "Cargando...",
+  "failedToLoadImage": "Error al cargar la imagen"
+}

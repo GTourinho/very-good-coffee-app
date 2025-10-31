@@ -1,0 +1,92 @@
+{
+  "@@locale": "en",
+  "appTitle": "Very Good Coffee App",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Favorites tab label"
+  },
+  
+  "home": "Home",
+  "@home": {
+    "description": "Home tab label"
+  },
+  
+  "favoriteCoffees": "Favorite Coffees",
+  "@favoriteCoffees": {
+    "description": "Title for favorites page"
+  },
+  
+  "getYourFirstCoffee": "Get Your First Coffee",
+  "@getYourFirstCoffee": {
+    "description": "Call to action when no coffee is displayed"
+  },
+  
+  "newCoffee": "New Coffee",
+  "@newCoffee": {
+    "description": "Button text to get a new coffee"
+  },
+  
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Button text to retry an operation"
+  },
+  
+  "noFavoriteCoffees": "No favorite coffees yet",
+  "@noFavoriteCoffees": {
+    "description": "Message when there are no favorite coffees"
+  },
+  
+  "noFavoriteCoffeesDescription": "Tap the heart icon on any coffee to add it to favorites",
+  "@noFavoriteCoffeesDescription": {
+    "description": "Description for empty favorites state"
+  },
+  
+  "oopsSomethingWentWrong": "Oops! Something went wrong",
+  "@oopsSomethingWentWrong": {
+    "description": "Generic error message title"
+  },
+  
+  "couldNotLoadCoffees": "Could not load your favorite coffees. Please try again.",
+  "@couldNotLoadCoffees": {
+    "description": "Error message for failed coffee loading"
+  },
+  
+  "couldNotLoadCoffee": "Could not load coffee. Please try again.",
+  "@couldNotLoadCoffee": {
+    "description": "Error message for failed coffee loading"
+  },
+  
+  "couldNotUpdateFavorites": "Oops! Could not update your favorites. Please try again",
+  "@couldNotUpdateFavorites": {
+    "description": "Error message for failed favorite update"
+  },
+  
+  "coffee": "Coffee #{id}",
+  "@coffee": {
+    "description": "Coffee item label with ID",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "zoomHint": "Pinch to zoom",
+  "@zoomHint": {
+    "description": "Hint text for image zoom functionality"
+  },
+  
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  
+  "failedToLoadImage": "Failed to load image",
+  "@failedToLoadImage": {
+    "description": "Error message when image fails to load"
+  }
+}
