@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
 
@@ -95,7 +96,8 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('es')
+    Locale('es'),
+    Locale('pt')
   ];
 
   /// The title of the application
@@ -199,6 +201,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load image'**
   String get failedToLoadImage;
+
+  /// Settings page title
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// Theme settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Settings'**
+  String get themeSettings;
+
+  /// Theme selection subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your favorite coffee roast'**
+  String get chooseYourRoast;
+
+  /// Light roast theme name
+  ///
+  /// In en, this message translates to:
+  /// **'Light Roast'**
+  String get lightRoast;
+
+  /// Light roast theme description
+  ///
+  /// In en, this message translates to:
+  /// **'Bright, fresh, and creamy vibe'**
+  String get lightRoastDescription;
+
+  /// Medium roast theme name
+  ///
+  /// In en, this message translates to:
+  /// **'Medium Roast'**
+  String get mediumRoast;
+
+  /// Medium roast theme description
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced, warm, and inviting'**
+  String get mediumRoastDescription;
+
+  /// Dark roast theme name
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Roast'**
+  String get darkRoast;
+
+  /// Dark roast theme description
+  ///
+  /// In en, this message translates to:
+  /// **'Bold, rich, and cozy feel'**
+  String get darkRoastDescription;
 }
 
 class _AppLocalizationsDelegate
@@ -212,7 +268,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'es'].contains(locale.languageCode);
+      <String>['en', 'es', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -225,6 +281,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'pt':
+      return AppLocalizationsPt();
   }
 
   throw FlutterError(

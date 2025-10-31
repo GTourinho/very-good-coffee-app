@@ -41,3 +41,21 @@ class CoffeeFavoriteToggled extends CoffeeEvent {
   @override
   List<Object?> get props => [coffee];
 }
+
+/// {@template coffee_migration_requested}
+/// Event triggered when migration of existing cached 
+/// images to favorites is requested.
+/// {@endtemplate}
+class CoffeeMigrationRequested extends CoffeeEvent {
+  /// {@macro coffee_migration_requested}
+  const CoffeeMigrationRequested();
+}
+
+/// {@template coffee_favorite_sync_requested}
+/// Event triggered when the current coffee's favorite status 
+/// needs to be synced with the favorites list.
+/// {@endtemplate}
+class CoffeeFavoriteSyncRequested extends CoffeeEvent {
+  /// {@macro coffee_favorite_sync_requested}
+  const CoffeeFavoriteSyncRequested();
+}

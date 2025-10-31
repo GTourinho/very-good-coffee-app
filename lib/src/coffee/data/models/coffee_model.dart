@@ -12,6 +12,7 @@ class CoffeeModel extends Coffee {
     required super.id,
     required super.imageUrl,
     super.isFavorite = false,
+    this.originalUrl,
   });
 
   /// Creates a [CoffeeModel] from a JSON object.
@@ -46,6 +47,9 @@ class CoffeeModel extends Coffee {
     );
   }
 
+  /// Original URL before caching (used as fallback if cached file is lost)
+  final String? originalUrl;
+
   /// Converts to JSON.
   Map<String, dynamic> toJson() => _$CoffeeModelToJson(this);
 
@@ -54,6 +58,22 @@ class CoffeeModel extends Coffee {
     ImageCacheService imageCacheService,
   ) async {
     final cachedPath = await imageCacheService.getCachedImagePath(imageUrl);
-    return cachedPath ?? imageUrl;
+    return cachedPath ?? originalUrl ?? imageUrl;
+  }
+
+  /// Creates a copy with updated values.
+  @override
+  CoffeeModel copyWith({
+    String? id,
+    String? imageUrl,
+    bool? isFavorite,
+    String? originalUrl,
+  }) {
+    return CoffeeModel(
+      id: id ?? this.id,
+      imageUrl: imageUrl ?? this.imageUrl,
+      isFavorite: isFavorite ?? this.isFavorite,
+      originalUrl: originalUrl ?? this.originalUrl,
+    );
   }
 }

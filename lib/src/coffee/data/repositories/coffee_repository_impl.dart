@@ -1,6 +1,7 @@
 import 'package:coffee_app/src/coffee/data/datasources/coffee_local_datasource.dart';
 import 'package:coffee_app/src/coffee/data/datasources/coffee_remote_datasource.dart';
 import 'package:coffee_app/src/coffee/data/models/coffee_model.dart';
+import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/domain/repositories/coffee_repository.dart';
 
@@ -25,21 +26,29 @@ class CoffeeRepositoryImpl implements CoffeeRepository {
     final coffeeModel = await remoteDataSource();
     final isFavorite = await localDataSource.isCoffeeFavorite(coffeeModel.id);
     
-    return coffeeModel.copyWith(isFavorite: isFavorite);
+    return Coffee(
+      id: coffeeModel.id,
+      imageUrl: coffeeModel.imageUrl,
+      isFavorite: isFavorite,
+    );
   }
 
   @override
   Future<List<Coffee>> getFavoriteCoffees() async {
     final coffeeModels = await localDataSource.getFavoriteCoffees();
     return coffeeModels
-        .map((model) => model.copyWith(isFavorite: true))
+        .map((model) => Coffee(
+          id: model.id,
+          imageUrl: model.imageUrl,
+          isFavorite: true,
+        ),)
         .toList();
   }
 
   @override
-  Future<void> saveFavoriteCoffee(Coffee coffee) async {
+  Future<ImageCacheResult> saveFavoriteCoffee(Coffee coffee) async {
     final coffeeModel = CoffeeModel.fromEntity(coffee);
-    await localDataSource.saveFavoriteCoffee(coffeeModel);
+    return localDataSource.saveFavoriteCoffee(coffeeModel);
   }
 
   @override

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 // We can ignore this here because we don't need a 
 // comment for each individual property
 // ignore_for_file: public_member_api_docs

@@ -2,6 +2,7 @@ import 'package:coffee_app/src/coffee/data/datasources/coffee_local_datasource.d
 import 'package:coffee_app/src/coffee/data/datasources/coffee_remote_datasource.dart';
 import 'package:coffee_app/src/coffee/data/models/coffee_model.dart';
 import 'package:coffee_app/src/coffee/data/repositories/coffee_repository_impl.dart';
+import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -111,12 +112,14 @@ void main() {
           );
 
           when(() => mockLocalDataSource.saveFavoriteCoffee(any()))
-              .thenAnswer((_) async {});
+              .thenAnswer((_) async => ImageCacheResult.success('/path/to/image'));
 
           // act
-          await repository.saveFavoriteCoffee(tCoffee);
+          final result = await repository.saveFavoriteCoffee(tCoffee);
 
           // assert
+          expect(result.success, true);
+          expect(result.filePath, '/path/to/image');
           verify(() => mockLocalDataSource.saveFavoriteCoffee(
                 CoffeeModel.fromEntity(tCoffee),
               ),).called(1);

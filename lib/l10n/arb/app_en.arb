@@ -88,5 +88,50 @@
   "failedToLoadImage": "Failed to load image",
   "@failedToLoadImage": {
     "description": "Error message when image fails to load"
+  },
+  
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings page title"
+  },
+  
+  "themeSettings": "Theme Settings",
+  "@themeSettings": {
+    "description": "Theme settings section title"
+  },
+  
+  "chooseYourRoast": "Choose your favorite coffee roast",
+  "@chooseYourRoast": {
+    "description": "Theme selection subtitle"
+  },
+  
+  "lightRoast": "Light Roast",
+  "@lightRoast": {
+    "description": "Light roast theme name"
+  },
+  
+  "lightRoastDescription": "Bright, fresh, and creamy vibe",
+  "@lightRoastDescription": {
+    "description": "Light roast theme description"
+  },
+  
+  "mediumRoast": "Medium Roast",
+  "@mediumRoast": {
+    "description": "Medium roast theme name"
+  },
+  
+  "mediumRoastDescription": "Balanced, warm, and inviting",
+  "@mediumRoastDescription": {
+    "description": "Medium roast theme description"
+  },
+  
+  "darkRoast": "Dark Roast",
+  "@darkRoast": {
+    "description": "Dark roast theme name"
+  },
+  
+  "darkRoastDescription": "Bold, rich, and cozy feel",
+  "@darkRoastDescription": {
+    "description": "Dark roast theme description"
   }
 }

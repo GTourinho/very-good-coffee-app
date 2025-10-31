@@ -4,3 +4,17 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+
+# Coverage configuration
+coverage:
+  exclude:
+    # Generated files
+    - "**/l10n/generated/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    # Test files
+    - "**/test/**"
+    # Example files
+    - "**/example/**"
+    # Configuration files
+    - "**/lib/**/main.dart"

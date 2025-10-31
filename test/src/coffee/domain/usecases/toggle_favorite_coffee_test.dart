@@ -1,3 +1,4 @@
+import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/domain/repositories/coffee_repository.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/toggle_favorite_coffee.dart';
@@ -41,7 +42,7 @@ void main() {
       () async {
         // arrange
         when(() => mockRepository.saveFavoriteCoffee(any()))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => ImageCacheResult.success('/path/to/image'));
         when(() => mockRepository.removeFavoriteCoffee(any()))
             .thenAnswer((_) async {});
 
@@ -49,7 +50,8 @@ void main() {
         final result = await usecase(tCoffee);
 
         // assert
-        expect(result, tFavoriteCoffee);
+        expect(result.$1, tFavoriteCoffee);
+        expect(result.$2.success, true);
         verify(() => mockRepository.saveFavoriteCoffee(tCoffee)).called(1);
         verifyNever(() => mockRepository.removeFavoriteCoffee(any()));
         verifyNoMoreInteractions(mockRepository);
@@ -61,7 +63,7 @@ void main() {
       () async {
         // arrange
         when(() => mockRepository.saveFavoriteCoffee(any()))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => ImageCacheResult.success('/path/to/image'));
         when(() => mockRepository.removeFavoriteCoffee(any()))
             .thenAnswer((_) async {});
 
@@ -69,7 +71,8 @@ void main() {
         final result = await usecase(tFavoriteCoffee);
 
         // assert
-        expect(result, tCoffee);
+        expect(result.$1, tCoffee);
+        expect(result.$2.success, true);
         verifyNever(() => mockRepository.saveFavoriteCoffee(any()));
         verify(() => mockRepository.removeFavoriteCoffee('1')).called(1);
         verifyNoMoreInteractions(mockRepository);

@@ -1,0 +1,40 @@
+{
+  "@@locale": "pt",
+  "appTitle": "Aplicativo de Café Muito Bom",
+  
+  "favorites": "Favoritos",
+  "home": "Início",
+  
+  "favoriteCoffees": "Cafés Favoritos",
+  
+  "getYourFirstCoffee": "Pegue Seu Primeiro Café",
+  "newCoffee": "Novo Café",
+  "tryAgain": "Tentar Novamente",
+  
+  "noFavoriteCoffees": "Ainda não há cafés favoritos",
+  "noFavoriteCoffeesDescription": "Toque no ícone de coração em qualquer café para adicioná-lo aos favoritos",
+  
+  "oopsSomethingWentWrong": "Ops! Algo deu errado",
+  "couldNotLoadCoffees": "Não foi possível carregar seus cafés favoritos. Por favor, tente novamente.",
+  "couldNotLoadCoffee": "Não foi possível carregar o café. Por favor, tente novamente.",
+  "couldNotUpdateFavorites": "Ops! Não foi possível atualizar seus favoritos. Por favor, tente novamente",
+  
+  "coffee": "Café #{id}",
+  
+  "zoomHint": "Belisque para ampliar",
+  "loading": "Carregando...",
+  "failedToLoadImage": "Falha ao carregar imagem",
+  
+  "settings": "Configurações",
+  "themeSettings": "Configurações de Tema",
+  "chooseYourRoast": "Escolha seu tostado de café favorito",
+  
+  "lightRoast": "Tostado Claro",
+  "lightRoastDescription": "Brilhante, fresco e cremoso",
+  
+  "mediumRoast": "Tostado Médio",
+  "mediumRoastDescription": "Equilibrado, quente e convidativo",
+  
+  "darkRoast": "Tostado Escuro",
+  "darkRoastDescription": "Forte, rico e aconchegante"
+}

@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:coffee_app/src/coffee/data/services/image_cache_service.dart';
 import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_favorite_coffees.dart';
 import 'package:coffee_app/src/coffee/domain/usecases/get_random_coffee.dart';
@@ -79,6 +80,7 @@ void main() {
             'Server error',
           ),
         );
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
 
         return CoffeeBloc(
           getRandomCoffee: mockGetRandomCoffee,
@@ -110,10 +112,13 @@ void main() {
         );
         when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
         when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
-          (_) async => const Coffee(
-            id: '1',
-            imageUrl: 'https://example.com/coffee.jpg',
-            isFavorite: true,
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            ImageCacheResult.success('cached:test.jpg'),
           ),
         );
 
@@ -143,11 +148,26 @@ void main() {
             imageUrl: 'https://example.com/coffee.jpg',
           ),
         ),
+        // Optimistic update
         const CoffeeLoadSuccess(
           currentCoffee: Coffee(
             id: '1',
             imageUrl: 'https://example.com/coffee.jpg',
             isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Sync with actual state (empty because mock returns empty list)
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
           ),
         ),
       ],
@@ -185,7 +205,8 @@ void main() {
     );
 
     blocTest<CoffeeBloc, CoffeeState>(
-      'emits CoffeeActionError then restores state when toggle favorite fails',
+      'reverts to previous state and shows error when toggle favorite '
+      'throws exception',
       build: () {
         when(() => mockToggleFavoriteCoffee(any()))
             .thenThrow(Exception('Failed to toggle'));
@@ -212,11 +233,424 @@ void main() {
         ),
       ),
       expect: () => [
-        isA<CoffeeActionError>().having(
-          (state) => state.error,
-          'error',
-          'Oops! Could not update your favorites. Please try again.',
+        // Optimistic update - adds to favorites
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
         ),
+        // Revert to original state due to error
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar
+        isA<CoffeeActionError>().having(
+          (e) => e.error,
+          'error',
+          'Failed to toggle favorite. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'Handles getFavoriteCoffees failure in toggle favorite '
+      'after optimistic update.',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            ImageCacheResult.success('cached:test.jpg'),
+          ),
+        );
+        when(() => mockGetFavoriteCoffees()).thenThrow(
+          Exception('Failed to sync favorites'),
+        );
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update - adds to favorites
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Revert to original state due to sync error
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar
+        isA<CoffeeActionError>().having(
+          (e) => e.error,
+          'error',
+          'Failed to toggle favorite. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'emits CoffeeLoadFailure when CoffeeFavoritesRequested fails',
+      build: () {
+        when(() => mockGetFavoriteCoffees()).thenThrow(
+          Exception('Failed to load favorites'),
+        );
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      act: (bloc) => bloc.add(const CoffeeFavoritesRequested()),
+      expect: () => [
+        const CoffeeLoadFailure(
+          'Oops! Could not load your favorite coffees. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'handles toggle favorite exception when toggleFavoriteCoffee throws',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any()))
+            .thenThrow(Exception('Toggle failed'));
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Revert to original state due to exception
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar
+        isA<CoffeeActionError>().having(
+          (e) => e.error,
+          'error',
+          'Failed to toggle favorite. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'handles toggle favorite when getFavoriteCoffees throws during sync',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            ImageCacheResult.success('cached:test.jpg'),
+          ),
+        );
+        when(() => mockGetFavoriteCoffees()).thenThrow(
+          Exception('Sync failed'),
+        );
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Revert to original state due to sync error
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar
+        isA<CoffeeActionError>().having(
+          (e) => e.error,
+          'error',
+          'Failed to toggle favorite. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'handles exception in toggle favorite when toggleFavoriteCoffee throws',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any()))
+            .thenThrow(Exception('Toggle operation failed'));
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Revert to original state due to exception
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar
+        isA<CoffeeActionError>().having(
+          (e) => e.error,
+          'error',
+          'Failed to toggle favorite. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'handles exception in _onCoffeeFavoritesRequested',
+      build: () {
+        when(() => mockGetFavoriteCoffees())
+            .thenThrow(Exception('Failed to get favorites'));
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      act: (bloc) => bloc.add(const CoffeeFavoritesRequested()),
+      expect: () => [
+        const CoffeeLoadFailure(
+          'Oops! Could not load your favorite coffees. Please try again.',
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'emits CoffeeLoadSuccess when CoffeeFavoritesRequested is added '
+      'and state is not CoffeeLoadSuccess',
+      build: () {
+        final favorites = [
+          const Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee1.jpg',
+            isFavorite: true,
+          ),
+          const Coffee(
+            id: '2',
+            imageUrl: 'https://example.com/coffee2.jpg',
+            isFavorite: true,
+          ),
+        ];
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => favorites);
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      act: (bloc) => bloc.add(const CoffeeFavoritesRequested()),
+      expect: () => [
+        const CoffeeLoadSuccess(
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee1.jpg',
+              isFavorite: true,
+            ),
+            Coffee(
+              id: '2',
+              imageUrl: 'https://example.com/coffee2.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'removes coffee from favorites when toggling favorite off',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+            ),
+            ImageCacheResult.success('cached:test.jpg'),
+          ),
+        );
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+          isFavorite: true,
+        ),
+        favoriteCoffees: [
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+        ],
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update - removes from favorites
+        //  (sync state is same, no duplicate)
         const CoffeeLoadSuccess(
           currentCoffee: Coffee(
             id: '1',
@@ -225,5 +659,245 @@ void main() {
         ),
       ],
     );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'does not add duplicate when coffee already in favorites',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            ImageCacheResult.success('cached:test.jpg'),
+          ),
+        );
+        when(() => mockGetFavoriteCoffees()).thenAnswer(
+          (_) async => [
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        );
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+        favoriteCoffees: [
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+        ],
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update - coffee already in list,
+        //  no duplicate (sync state is same, no duplicate emit)
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'reverts state and shows error when cache result fails',
+      build: () {
+        when(() => mockToggleFavoriteCoffee(any())).thenAnswer(
+          (_) async => (
+            const Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            ImageCacheResult.error(
+              ImageCacheErrorType.network,
+              'Network error occurred',
+            ),
+          ),
+        );
+        when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
+
+        return CoffeeBloc(
+          getRandomCoffee: mockGetRandomCoffee,
+          getFavoriteCoffees: mockGetFavoriteCoffees,
+          toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+        );
+      },
+      seed: () => const CoffeeLoadSuccess(
+        currentCoffee: Coffee(
+          id: '1',
+          imageUrl: 'https://example.com/coffee.jpg',
+        ),
+      ),
+      act: (bloc) => bloc.add(
+        const CoffeeFavoriteToggled(
+          Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+      ),
+      expect: () => [
+        // Optimistic update
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+            isFavorite: true,
+          ),
+          favoriteCoffees: [
+            Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+          ],
+        ),
+        // Revert to original state due to cache error
+        const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        // Error state for snackbar with cache error message
+        isA<CoffeeActionError>()
+            .having(
+              (e) => e.error,
+              'error',
+              'Network error occurred',
+            )
+            .having(
+              (e) => e.previousState,
+              'previousState',
+              const CoffeeLoadSuccess(
+                currentCoffee: Coffee(
+                  id: '1',
+                  imageUrl: 'https://example.com/coffee.jpg',
+                ),
+              ),
+            ),
+      ],
+    );
+
+    group('CoffeeFavoriteSyncRequested', () {
+      blocTest<CoffeeBloc, CoffeeState>(
+        'syncs current coffee favorite status with favorites list',
+        build: () {
+          when(() => mockGetFavoriteCoffees()).thenAnswer(
+            (_) async => [
+              const Coffee(
+                id: '1',
+                imageUrl: 'https://example.com/coffee.jpg',
+                isFavorite: true,
+              ),
+            ],
+          );
+
+          return CoffeeBloc(
+            getRandomCoffee: mockGetRandomCoffee,
+            getFavoriteCoffees: mockGetFavoriteCoffees,
+            toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+          );
+        },
+        seed: () => const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        act: (bloc) => bloc.add(const CoffeeFavoriteSyncRequested()),
+        expect: () => [
+          const CoffeeLoadSuccess(
+            currentCoffee: Coffee(
+              id: '1',
+              imageUrl: 'https://example.com/coffee.jpg',
+              isFavorite: true,
+            ),
+            favoriteCoffees: [
+              Coffee(
+                id: '1',
+                imageUrl: 'https://example.com/coffee.jpg',
+                isFavorite: true,
+              ),
+            ],
+          ),
+        ],
+      );
+
+      blocTest<CoffeeBloc, CoffeeState>(
+        'handles sync gracefully when get favorites throws exception',
+        build: () {
+          when(() => mockGetFavoriteCoffees()).thenThrow(
+            Exception(
+              'Network error',
+            ),
+          );
+
+          return CoffeeBloc(
+            getRandomCoffee: mockGetRandomCoffee,
+            getFavoriteCoffees: mockGetFavoriteCoffees,
+            toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+          );
+        },
+        seed: () => const CoffeeLoadSuccess(
+          currentCoffee: Coffee(
+            id: '1',
+            imageUrl: 'https://example.com/coffee.jpg',
+          ),
+        ),
+        act: (bloc) => bloc.add(const CoffeeFavoriteSyncRequested()),
+        expect: () => <CoffeeState>[], // No state change on sync failure
+      );
+
+      blocTest<CoffeeBloc, CoffeeState>(
+        'does nothing when current coffee is null',
+        build: () {
+          when(() => mockGetFavoriteCoffees()).thenAnswer((_) async => []);
+
+          return CoffeeBloc(
+            getRandomCoffee: mockGetRandomCoffee,
+            getFavoriteCoffees: mockGetFavoriteCoffees,
+            toggleFavoriteCoffee: mockToggleFavoriteCoffee,
+          );
+        },
+        seed: () => const CoffeeLoadSuccess(
+          
+        ),
+        act: (bloc) => bloc.add(const CoffeeFavoriteSyncRequested()),
+        expect: () => <CoffeeState>[], // No state change when current coffee is
+      );
+    });
   });
 }

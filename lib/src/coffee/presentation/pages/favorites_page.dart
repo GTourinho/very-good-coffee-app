@@ -6,12 +6,15 @@ import 'package:coffee_app/src/coffee/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/presentation/bloc/coffee_state.dart';
+import 'package:coffee_app/src/coffee/presentation/widgets/main_navigation.dart';
 import 'package:coffee_app/src/core/design_system/app_colors.dart';
 import 'package:coffee_app/src/core/design_system/app_spacing.dart';
 import 'package:coffee_app/src/core/design_system/app_text_styles.dart';
 import 'package:coffee_app/src/core/services/user_feedback_service.dart';
+import 'package:coffee_app/src/core/widgets/full_screen_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 /// Favorites page widget.
 class FavoritesPage extends StatelessWidget {
@@ -20,13 +23,22 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => GetIt.instance<CoffeeBloc>(),
+      child: _FavoritesPageContent(),
+    );
+  }
+}
+
+class _FavoritesPageContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     context.read<CoffeeBloc>().add(const CoffeeFavoritesRequested());
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.favoriteCoffees),
-        automaticallyImplyLeading: false,
       ),
       body: BlocListener<CoffeeBloc, CoffeeState>(
         listenWhen: (previous, current) =>
@@ -125,6 +137,7 @@ class FavoritesPage extends StatelessWidget {
           },
         ),
       ),
+      bottomNavigationBar: const AppBottomNavigation(currentIndex: 1),
     );
   }
 }
@@ -207,37 +220,7 @@ class FavoriteCard extends StatelessWidget {
   }
 
   void _showFullImage(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final isFilePath = coffee.imageUrl.startsWith('/');
-
-    unawaited(
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (context) => Scaffold(
-            backgroundColor: Colors.black,
-            appBar: AppBar(
-              backgroundColor: Colors.black,
-              iconTheme: const IconThemeData(color: Colors.white),
-              title: Text(
-                l10n.zoomHint,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: Colors.white70,
-                ),
-              ),
-            ),
-            body: Center(
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4,
-                child: isFilePath
-                    ? Image.file(File(coffee.imageUrl))
-                    : Image.network(coffee.imageUrl),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    unawaited(FullScreenImageViewer.show(context, coffee.imageUrl));
   }
 }
 

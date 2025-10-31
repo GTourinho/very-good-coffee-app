@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:coffee_app/src/core/design_system/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -142,30 +143,23 @@ class AppTextStyles {
   /// Page title text style
   static TextStyle get pageTitle => headlineMedium.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.onSurface,
       );
 
   /// Section title text style
   static TextStyle get sectionTitle => titleLarge.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.onSurface,
       );
 
   /// Card title text style
   static TextStyle get cardTitle => titleMedium.copyWith(
         fontWeight: FontWeight.w500,
-        color: AppColors.onSurface,
       );
 
   /// Body text style
-  static TextStyle get bodyText => bodyMedium.copyWith(
-        color: AppColors.onSurface,
-      );
+  static TextStyle get bodyText => bodyMedium;
 
   /// Caption text style
-  static TextStyle get caption => bodySmall.copyWith(
-        color: AppColors.grey600,
-      );
+  static TextStyle get caption => bodySmall;
 
   /// Button text style
   static TextStyle get buttonText => labelLarge.copyWith(

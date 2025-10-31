@@ -65,5 +65,32 @@ void main() {
         verifyNoMoreInteractions(mockHttpClient);
       },
     );
+
+    test(
+      'should throw an Exception when JSON parsing fails',
+      () async {
+        // arrange
+        when(() => mockHttpClient.get(any()))
+            .thenAnswer((_) async => http.Response('invalid json', 200));
+
+        // act & assert
+        expect(
+          () => dataSource(),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Something went wrong while loading your coffee'),
+            ),
+          ),
+        );
+        
+        verify(() => mockHttpClient.get(
+              Uri.parse('https://coffee.alexflipnote.dev/random.json'),
+            ),
+          ).called(1);
+        verifyNoMoreInteractions(mockHttpClient);
+      },
+    );
   });
 }

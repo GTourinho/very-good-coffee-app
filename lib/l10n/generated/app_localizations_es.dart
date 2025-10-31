@@ -64,4 +64,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get failedToLoadImage => 'Error al cargar la imagen';
+
+  @override
+  String get settings => 'Configuración';
+
+  @override
+  String get themeSettings => 'Configuración de Tema';
+
+  @override
+  String get chooseYourRoast => 'Elige tu tostado de café favorito';
+
+  @override
+  String get lightRoast => 'Tostado Claro';
+
+  @override
+  String get lightRoastDescription => 'Vibrante, fresco y cremoso';
+
+  @override
+  String get mediumRoast => 'Tostado Medio';
+
+  @override
+  String get mediumRoastDescription => 'Equilibrado, cálido y acogedor';
+
+  @override
+  String get darkRoast => 'Tostado Oscuro';
+
+  @override
+  String get darkRoastDescription => 'Audaz, rico y acogedor';
 }

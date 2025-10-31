@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:coffee_app/l10n/generated/app_localizations.dart';
@@ -7,6 +8,7 @@ import 'package:coffee_app/src/coffee/presentation/bloc/coffee_event.dart';
 import 'package:coffee_app/src/core/design_system/app_colors.dart';
 import 'package:coffee_app/src/core/design_system/app_spacing.dart';
 import 'package:coffee_app/src/core/design_system/app_text_styles.dart';
+import 'package:coffee_app/src/core/widgets/full_screen_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -65,34 +67,7 @@ class CoffeeImageWidget<T extends Coffee> extends StatelessWidget {
   }
 
   Future<void> _showFullImage(BuildContext context, String imagePath) async {
-    if (!context.mounted) return;
-
-    final l10n = AppLocalizations.of(context);
-
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
-            title: Text(
-              l10n.zoomHint,
-              style: AppTextStyles.caption.copyWith(color: Colors.white70),
-            ),
-          ),
-          body: Center(
-            child: InteractiveViewer(
-              minScale: 0.5,
-              maxScale: 4,
-              child: imagePath.startsWith('http')
-                  ? Image.network(imagePath)
-                  : Image.file(File(imagePath)),
-            ),
-          ),
-        ),
-      ),
-    );
+    await FullScreenImageViewer.show(context, imagePath);
   }
 }
 
@@ -148,6 +123,9 @@ class _CoffeeImage extends StatelessWidget {
       imageWidget = Image.network(
         imageUrl,
         fit: BoxFit.contain,
+        // Optimize memory usage by decoding at display size
+        cacheWidth: 800,
+        cacheHeight: 800,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Center(

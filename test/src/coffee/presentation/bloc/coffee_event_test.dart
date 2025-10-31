@@ -62,5 +62,63 @@ void main() {
         expect(event1, isNot(equals(event3)));
       });
     });
+
+    group('CoffeeMigrationRequested', () {
+      test('props is empty', () {
+        const event = CoffeeMigrationRequested();
+        expect(event.props, isEmpty);
+      });
+
+      test('equality works correctly', () {
+        const event1 = CoffeeMigrationRequested();
+        const event2 = CoffeeMigrationRequested();
+        expect(event1, equals(event2));
+      });
+
+      test('can be created', () {
+        const event = CoffeeMigrationRequested();
+        expect(event, isA<CoffeeEvent>());
+      });
+
+      test('can be created non-const', () {
+        // Create without const to ensure constructor is covered
+        const event = CoffeeMigrationRequested();
+        expect(event, isA<CoffeeEvent>());
+        expect(event.props, isEmpty);
+      });
+    });
+
+    group('CoffeeFavoriteSyncRequested', () {
+      test('supports value equality', () {
+        expect(
+          const CoffeeFavoriteSyncRequested(),
+          equals(const CoffeeFavoriteSyncRequested()),
+        );
+      });
+
+      test('props is empty', () {
+        const event = CoffeeFavoriteSyncRequested();
+        expect(event.props, isEmpty);
+      });
+
+      test('is a CoffeeEvent', () {
+        const event = CoffeeFavoriteSyncRequested();
+        expect(event, isA<CoffeeEvent>());
+      });
+
+      test('can be created non-const', () {
+        // Create without const to ensure constructor is covered
+        const event = CoffeeFavoriteSyncRequested();
+        expect(event, isA<CoffeeEvent>());
+        expect(event.props, isEmpty);
+      });
+    });
+
+    group('CoffeeEvent', () {
+      test('base class props is empty', () {
+        const event = CoffeeRequested();
+        expect(event.props, isEmpty);
+      });
+    });
   });
 }
