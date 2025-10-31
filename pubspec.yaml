@@ -1,0 +1,47 @@
+name: coffee_app
+description: A Very Good Project created by Very Good CLI.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  bloc: ^9.1.0
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  flutter_localizations:
+    sdk: flutter
+  get_it: ^8.0.3
+  google_fonts: ^6.2.1
+  http: ^1.2.2
+  image: ^4.2.0
+  json_annotation: ^4.9.0
+  logger: ^2.4.0
+  path_provider: ^2.1.4
+  photo_view: ^0.15.0
+  shared_preferences: ^2.3.3
+
+dev_dependencies:
+  bloc_test: ^10.0.0
+  build_runner: ^2.4.13
+  flutter_test:
+    sdk: flutter
+  json_serializable: ^6.8.0
+  mocktail: ^1.0.4
+  very_good_analysis: ^10.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+# Flutter internationalization configuration
+flutter_intl:
+  enabled: true
+  arb_dir: lib/l10n
+  output_dir: lib/generated
+  output_localization_file: app_localizations.dart
+  template_arb_file: app_en.arb
+  output_class: AppLocalizations

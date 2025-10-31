@@ -1,0 +1,13 @@
+# Test configuration
+tags:
+  # Integration tests that require platform plugins
+  integration:
+    description: Integration tests requiring platform plugins like path_provider
+
+# Coverage configuration
+coverage:
+  # Exclude generated files from coverage
+  exclude:
+    - lib/l10n/generated/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
