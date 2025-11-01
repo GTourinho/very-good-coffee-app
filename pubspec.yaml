@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   bloc: ^9.1.0
+  coffee_repository:
+    path: packages/coffee_repository
   equatable: ^2.0.5
   flutter:
     sdk: flutter

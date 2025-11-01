@@ -1,5 +1,5 @@
 import 'package:coffee_app/l10n/l10n.dart';
-import 'package:coffee_app/src/coffee/presentation/widgets/main_navigation.dart';
+import 'package:coffee_app/src/coffee/view/widgets/main_navigation.dart';
 import 'package:coffee_app/src/core/design_system/app_theme.dart';
 import 'package:coffee_app/src/core/theme/theme_cubit.dart';
 import 'package:flutter/material.dart';

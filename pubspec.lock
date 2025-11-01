@@ -169,6 +169,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
+  coffee_repository:
+    dependency: "direct main"
+    description:
+      path: "packages/coffee_repository"
+      relative: true
+    source: path
+    version: "1.0.0"
   collection:
     dependency: transitive
     description:
