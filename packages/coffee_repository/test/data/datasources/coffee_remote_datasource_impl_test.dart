@@ -1,8 +1,8 @@
 import 'package:coffee_repository/src/data/datasources/coffee_remote_datasource_impl.dart';
 import 'package:coffee_repository/src/data/models/coffee_model.dart';
-import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
 

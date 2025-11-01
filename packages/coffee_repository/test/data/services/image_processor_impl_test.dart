@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:coffee_repository/src/data/services/image_processor_impl.dart';
-import 'package:test/test.dart';
 import 'package:image/image.dart' as img;
+import 'package:test/test.dart';
 
 void main() {
   late ImageProcessorImpl imageProcessor;

@@ -1,5 +1,5 @@
-import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_event.dart';
+import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -5,7 +5,7 @@ import 'package:coffee_repository/src/data/services/http_client.dart';
 import 'package:coffee_repository/src/data/services/image_cache_service.dart';
 import 'package:coffee_repository/src/data/services/image_cache_service_impl.dart';
 import 'package:coffee_repository/src/data/services/image_processor.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
@@ -395,7 +395,7 @@ void main() {
     group('default directory getter', () {
       test('uses default directory when no custom getter provided', () async {
         TestWidgetsFlutterBinding.ensureInitialized();
-
+        
         final defaultService = ImageCacheServiceImpl(
           httpClient: mockHttpClient,
           imageProcessor: mockImageProcessor,

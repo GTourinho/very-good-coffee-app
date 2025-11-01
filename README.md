@@ -40,7 +40,7 @@ A beautiful Flutter app that lets you discover and favorite coffee images from a
 
 This project maintains **100% code coverage** across all source files:
 - ✅ **249 tests** covering all business logic
-- ✅ **761/761 lines** covered with zero exclusions
+- ✅ **772/772 lines** covered with zero exclusions
 - ✅ All layers tested: Data, Domain, Business Logic, and Presentation
 
 ---
@@ -124,25 +124,80 @@ _\*Coffee App works on iOS and Android._
 
 ## Running Tests & Coverage 🧪
 
-### Local Testing
+### Test Structure
 
-For local development, use the following commands to run tests with proper coverage filtering:
+The project has tests in two locations:
+- **Main app tests**: `/test/` (162 tests) - UI, BLoC, and integration tests
+- **Package tests**: `/packages/coffee_repository/test/` (87 tests) - Repository layer tests
+
+**Total: 249 tests**
+
+### Running All Tests
+
+To run all tests, execute both commands:
 
 ```sh
-# Step 1: Run tests with coverage
-very_good test --test-randomize-ordering-seed random --coverage
+# Test main app (162 tests)
+flutter test
 
-# Step 2: Filter out excluded files (matches analysis_options.yaml)
-lcov --remove coverage/lcov.info "**/l10n/generated/**" --ignore-errors unused --output-file coverage/lcov.filtered && mv coverage/lcov.filtered coverage/lcov.info
+# Test coffee_repository package (87 tests)
+cd packages/coffee_repository && flutter test && cd ../..
+```
 
-# Step 3: Generate HTML report
-genhtml ./coverage/lcov.info -o coverage
+### Coverage Report
 
-# Step 4: Open coverage report in browser
+**Option 1: Combined Coverage Report (Recommended)**
+
+Merge coverage from both main app and package into one report:
+
+```sh
+# Run tests for main app
+very_good test --coverage --test-randomize-ordering-seed random
+
+# Run tests for package
+cd packages/coffee_repository && flutter test --coverage && cd ../..
+
+# Adjust package paths to be relative to project root
+sed 's|SF:lib/|SF:packages/coffee_repository/lib/|g' packages/coffee_repository/coverage/lcov.info > packages/coffee_repository/coverage/lcov_adjusted.info
+
+# Merge coverage files
+lcov --add-tracefile coverage/lcov.info \
+     --add-tracefile packages/coffee_repository/coverage/lcov_adjusted.info \
+     --output-file coverage/merged.info
+
+# Filter out generated files
+lcov --remove coverage/merged.info "**/l10n/generated/**" --ignore-errors unused --output-file coverage/lcov.info
+
+# Generate HTML report (all paths now relative to project root)
+genhtml coverage/lcov.info -o coverage --prefix "$PWD"
+
+# Open in browser
 open coverage/index.html
 ```
 
-This excludes generated localization files (`**/l10n/generated/**`) as specified in `analysis_options.yaml`.
+**Option 2: Separate Coverage Reports**
+
+For main app coverage only:
+
+```sh
+# Main app coverage
+very_good test --coverage --test-randomize-ordering-seed random
+lcov --remove coverage/lcov.info "**/l10n/generated/**" --ignore-errors unused --output-file coverage/lcov.filtered && mv coverage/lcov.filtered coverage/lcov.info
+genhtml ./coverage/lcov.info -o coverage
+open coverage/index.html
+```
+
+For package coverage only:
+
+```sh
+# Package coverage
+cd packages/coffee_repository
+flutter test --coverage
+genhtml ./coverage/lcov.info -o coverage
+open coverage/index.html
+```
+
+Coverage reports exclude generated localization files (`**/l10n/generated/**`) as specified in `analysis_options.yaml`.
 
 ### CI/CD Testing
 

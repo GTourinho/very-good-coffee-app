@@ -1,9 +1,9 @@
 import 'package:coffee_repository/src/data/datasources/coffee_local_datasource_impl.dart';
 import 'package:coffee_repository/src/data/models/coffee_model.dart';
 import 'package:coffee_repository/src/data/services/image_cache_service.dart';
-import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test/test.dart';
 
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 

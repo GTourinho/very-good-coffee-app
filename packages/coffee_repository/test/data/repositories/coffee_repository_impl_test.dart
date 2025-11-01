@@ -4,8 +4,8 @@ import 'package:coffee_repository/src/data/models/coffee_model.dart';
 import 'package:coffee_repository/src/data/repositories/coffee_repository_impl.dart';
 import 'package:coffee_repository/src/data/services/image_cache_service.dart';
 import 'package:coffee_repository/src/domain/entities/coffee.dart';
-import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
 
 class MockLocalDataSource extends Mock implements CoffeeLocalDataSource {}
 

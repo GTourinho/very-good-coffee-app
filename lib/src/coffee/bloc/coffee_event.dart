@@ -1,4 +1,4 @@
-import 'package:coffee_repository/src/domain/entities/coffee.dart';
+import 'package:coffee_repository/coffee_repository.dart';
 import 'package:equatable/equatable.dart';
 
 /// {@template coffee_event}

@@ -1,6 +1,6 @@
-import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_error_keys.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_state.dart';
+import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

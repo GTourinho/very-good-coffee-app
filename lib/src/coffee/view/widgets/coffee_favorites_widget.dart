@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_state.dart';
+import 'package:coffee_repository/coffee_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

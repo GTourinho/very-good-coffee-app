@@ -1,8 +1,8 @@
 import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:coffee_repository/src/domain/repositories/coffee_repository.dart';
 import 'package:coffee_repository/src/domain/usecases/get_favorite_coffees.dart';
-import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
 
 class MockCoffeeRepository extends Mock implements CoffeeRepository {}
 

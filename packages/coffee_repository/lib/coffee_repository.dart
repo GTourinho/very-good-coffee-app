@@ -1,5 +1,5 @@
 /// A repository for managing coffee data and business logic.
-library coffee_repository;
+library;
 
 export 'src/data/datasources/coffee_local_datasource.dart';
 export 'src/data/datasources/coffee_local_datasource_impl.dart';

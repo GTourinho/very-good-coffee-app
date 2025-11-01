@@ -1,13 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:coffee_app/src/coffee/bloc/coffee_bloc.dart';
+import 'package:coffee_app/src/coffee/bloc/coffee_error_keys.dart';
+import 'package:coffee_app/src/coffee/bloc/coffee_event.dart';
+import 'package:coffee_app/src/coffee/bloc/coffee_state.dart';
 import 'package:coffee_repository/src/data/services/image_cache_service.dart';
 import 'package:coffee_repository/src/domain/entities/coffee.dart';
 import 'package:coffee_repository/src/domain/usecases/get_favorite_coffees.dart';
 import 'package:coffee_repository/src/domain/usecases/get_random_coffee.dart';
 import 'package:coffee_repository/src/domain/usecases/toggle_favorite_coffee.dart';
-import 'package:coffee_app/src/coffee/bloc/coffee_bloc.dart';
-import 'package:coffee_app/src/coffee/bloc/coffee_error_keys.dart';
-import 'package:coffee_app/src/coffee/bloc/coffee_event.dart';
-import 'package:coffee_app/src/coffee/bloc/coffee_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

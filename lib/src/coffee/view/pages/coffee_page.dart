@@ -1,6 +1,5 @@
 import 'package:coffee_app/l10n/generated/app_localizations.dart';
 import 'package:coffee_app/l10n/l10n.dart';
-import 'package:coffee_repository/src/data/models/coffee_model.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_bloc.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_event.dart';
 import 'package:coffee_app/src/coffee/bloc/coffee_state.dart';
@@ -11,6 +10,7 @@ import 'package:coffee_app/src/core/design_system/app_colors.dart';
 import 'package:coffee_app/src/core/design_system/app_spacing.dart';
 import 'package:coffee_app/src/core/design_system/app_text_styles.dart';
 import 'package:coffee_app/src/core/services/user_feedback_service.dart';
+import 'package:coffee_repository/coffee_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
