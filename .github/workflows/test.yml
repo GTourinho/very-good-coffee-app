@@ -25,22 +25,36 @@ jobs:
     - name: Generate code
       run: dart run build_runner build --delete-conflicting-outputs
       
-    - name: Run tests with coverage
-      run: flutter test --coverage --test-randomize-ordering-seed random
-      
     - name: Install lcov
       run: sudo apt-get update && sudo apt-get install -y lcov
       
-    - name: Filter coverage (exclude files from analysis_options.yaml)
+    - name: Run main app tests with coverage
+      run: flutter test --coverage --test-randomize-ordering-seed random
+      
+    - name: Run package tests with coverage
       run: |
-        lcov --remove coverage/lcov.info "**/l10n/generated/**" --ignore-errors unused --output-file coverage/lcov.filtered
-        mv coverage/lcov.filtered coverage/lcov.info
+        cd packages/coffee_repository
+        flutter test --coverage
+        cd ../..
+        
+    - name: Merge coverage reports
+      run: |
+        # Adjust package paths to be relative to project root
+        sed 's|SF:lib/|SF:packages/coffee_repository/lib/|g' packages/coffee_repository/coverage/lcov.info > packages/coffee_repository/coverage/lcov_adjusted.info
+        
+        # Merge coverage files
+        lcov --add-tracefile coverage/lcov.info \
+             --add-tracefile packages/coffee_repository/coverage/lcov_adjusted.info \
+             --output-file coverage/merged.info
+        
+        # Filter out generated files
+        lcov --remove coverage/merged.info "**/l10n/generated/**" --ignore-errors unused --output-file coverage/lcov.info
         
     - name: Check coverage
       uses: VeryGoodOpenSource/very_good_coverage@v2
       with:
         path: 'coverage/lcov.info'
-        min_coverage: 85
+        min_coverage: 90
         exclude: '**/l10n/generated/**'
         
     - name: Upload coverage to Codecov

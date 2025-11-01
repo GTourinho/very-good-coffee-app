@@ -32,7 +32,6 @@ A beautiful Flutter app that lets you discover and favorite coffee images from a
 - **Loading States**: Smooth loading indicators for better UX
 - **Cross-Platform**: Native support for iOS and Android
 - **Clean Architecture**: 4-layer VGV architecture (Data, Repository, Business Logic, Presentation)
-- **100% Test Coverage**: 236 tests with complete code coverage (719/719 lines)
 
 ## Test Coverage 🎯
 
@@ -208,24 +207,6 @@ When pushing to GitHub, the CI/CD pipeline will automatically:
 - Generate coverage reports
 
 See `.github/workflows/test.yml` for the complete CI/CD configuration.
-
-### Test Structure
-
-```
-test/
-├── src/
-│   └── coffee/
-│       ├── data/
-│       │   ├── datasources/
-│       │   ├── models/
-│       │   └── repositories/
-│       ├── domain/
-│       │   └── usecases/
-│       └── presentation/
-│           └── bloc/
-```
-
----
 
 ## API Integration 🌐
 
